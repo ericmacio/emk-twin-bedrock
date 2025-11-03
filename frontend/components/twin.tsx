@@ -44,6 +44,7 @@ export default function Twin() {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'x-api-key': 'EMKapiKey1964'
                 },
                 body: JSON.stringify({
                     message: input,

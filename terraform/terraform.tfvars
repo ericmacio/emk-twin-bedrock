@@ -34,7 +34,7 @@ lambda_config = {
       "arn:aws:iam::aws:policy/AmazonBedrockFullAccess",
       "arn:aws:iam::aws:policy/AmazonS3FullAccess"
     ]
-    routes = ["GET /", "POST /chat", "GET /health"],
+    routes = ["GET /", "POST /chat", "GET /health", "GET /bedrock/list"],
   }
 }
 bedrock_model_id = "eu.amazon.nova-micro-v1:0"

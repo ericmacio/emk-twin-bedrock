@@ -57,6 +57,7 @@ module "lambda" {
     USE_S3           = "true"
     BEDROCK_MODEL_ID = var.bedrock_model_id
     CORS_ORIGINS     = "${module.cloudfront_distribution.cloudfront_url}"
+    DEFAULT_AWS_REGION = "eu-west-3"
   } : {}
 
   # Ensure Lambda waits for the distribution to exist

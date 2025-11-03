@@ -10,6 +10,11 @@ from datetime import datetime
 import boto3
 from botocore.exceptions import ClientError
 from context import prompt, get_summary
+import logging
+
+# Logger
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Load environment variables
 load_dotenv()
@@ -27,12 +32,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Initialize Bedrock client
-bedrock_client = boto3.client(
-    service_name="bedrock-runtime", 
-    region_name=os.getenv("DEFAULT_AWS_REGION", "eu-west-3")
-)
-
 # Bedrock model selection
 # Available models:
 # - amazon.nova-micro-v1:0  (fastest, cheapest)
@@ -44,10 +43,21 @@ BEDROCK_MODEL_ID = os.getenv("BEDROCK_MODEL_ID", "amazon.nova-lite-v1:0")
 USE_S3 = os.getenv("USE_S3", "false").lower() == "true"
 S3_BUCKET = os.getenv("S3_BUCKET", "")
 MEMORY_DIR = os.getenv("MEMORY_DIR", "../memory")
+region_name=os.getenv("DEFAULT_AWS_REGION", "eu-west-3")
 
 # Initialize S3 client if needed
 if USE_S3:
     s3_client = boto3.client("s3")
+
+# Initialize Bedrock client
+bedrock_client_control = boto3.client(
+    service_name="bedrock", 
+    region_name=region_name
+)
+bedrock_client_data = boto3.client(
+    service_name="bedrock-runtime", 
+    region_name=region_name
+)
 
 # Request/Response models
 class ChatRequest(BaseModel):
@@ -102,6 +112,7 @@ def save_conversation(session_id: str, messages: List[Dict]):
             json.dump(messages, f, indent=2)
 
 def call_bedrock(conversation: List[Dict], user_message: str) -> str:
+
     """Call AWS Bedrock with conversation history"""
     # Build messages in Bedrock format
     messages = []
@@ -127,7 +138,7 @@ def call_bedrock(conversation: List[Dict], user_message: str) -> str:
     
     try:
         # Call Bedrock using the converse API
-        response = bedrock_client.converse(
+        response = bedrock_client_data.converse(
             modelId=BEDROCK_MODEL_ID,
             messages=messages,
             inferenceConfig={
@@ -212,6 +223,18 @@ async def get_conversation(session_id: str):
         conversation = load_conversation(session_id)
         return {"session_id": session_id, "messages": conversation}
     except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/bedrock/list")
+async def bedrock_list_foundation_models():
+    try:
+        response = bedrock_client_control.list_foundation_models()
+        models = response["modelSummaries"]
+        logger.info("Got %s foundation models.", len(models))
+        return models
+
+    except ClientError as e:
+        logger.error("Couldn't list foundation models.")
         raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":

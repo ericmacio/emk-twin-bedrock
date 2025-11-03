@@ -1,0 +1,17 @@
+[
+  {
+    "role": "user",
+    "content": "help !",
+    "timestamp": "2025-10-31T15:16:18.969620"
+  },
+  {
+    "role": "user",
+    "content": "And now ?",
+    "timestamp": "2025-10-31T15:17:57.665167"
+  },
+  {
+    "role": "user",
+    "content": "ok and now is it better ?",
+    "timestamp": "2025-10-31T15:18:36.455311"
+  }
+]

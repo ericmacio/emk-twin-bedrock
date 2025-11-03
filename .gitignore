@@ -1,0 +1,10 @@
+aws.txt
+cmd.txt
+terraform/.terraform
+terraform/.terraform.lock.hcl
+terraform/terraform.tfstate
+terraform/terraform.tfstate.backup
+.env
+frontend/out
+frontend/node_modules
+backend/lambda-package

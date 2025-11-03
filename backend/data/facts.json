@@ -1,0 +1,21 @@
+{
+  "full_name": "Eric Macioszczyk",
+  "name": "Riri",
+  "current_role": "Software Architect",
+  "location": "Grenoble, France",
+  "email": "eric.macio@cegetel.net",
+  "linkedin": "linkedin.com/in/eric-macioszczyk-b25ba23",
+  "specialties": [
+    "Software architecture",
+    "AWS",
+    "Agentic AI"
+  ],
+  "years_experience": 30,
+  "education": [
+    {
+      "degree": "Master",
+      "institution": "ENSEA",
+      "year": "1988"
+    }
+  ]
+}

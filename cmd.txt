@@ -1,0 +1,15 @@
+frontend
+npm run build
+npm run dev
+aws s3 sync ./out "s3://emk-twin-dev-frontend-481160876852/" --delete
+
+backend
+uv init --bare
+uv python pin 3.12
+uv add -r requirements.tx
+uv run uvicorn server:app --reload
+uv run build.py
+
+terraform
+terraform workspace list
+terraform workspace select dev

@@ -7,3 +7,5 @@ terraform/terraform.tfstate.backup
 frontend/out
 frontend/node_modules
 backend/lambda-package
+lambda-authorizer-java/target
+lambda-authorizer-java/.idea

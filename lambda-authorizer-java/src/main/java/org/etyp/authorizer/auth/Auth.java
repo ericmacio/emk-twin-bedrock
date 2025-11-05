@@ -1,6 +1,7 @@
 package org.etyp.authorizer.auth;
 
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
+import com.amazonaws.services.lambda.runtime.events.APIGatewayV2CustomAuthorizerEvent;
 import org.etyp.authorizer.exceptions.CheckApiKeyException;
 import org.etyp.authorizer.helper.Utils;
 import org.etyp.authorizer.io.ApiKeyClaim;
@@ -15,11 +16,11 @@ public class Auth {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(Auth.class);
 
-    private final APIGatewayProxyRequestEvent.ProxyRequestContext proxyContext;
+    private final APIGatewayV2CustomAuthorizerEvent.RequestContext requestContext;
     private final String region;
 
-    public Auth(APIGatewayProxyRequestEvent.ProxyRequestContext proxyContext, String region) {
-        this.proxyContext = proxyContext;
+    public Auth(APIGatewayV2CustomAuthorizerEvent.RequestContext requestContext, String region) {
+        this.requestContext = requestContext;
         this.region = region;
     }
 
@@ -38,12 +39,12 @@ public class Auth {
         LOGGER.info(allow ? "Allow access" : "Access denied");
         return allow ?
                 new AuthPolicy(principalId,
-                        AuthPolicy.PolicyDocument.getAllowOnePolicy(region, proxyContext.getAccountId(), proxyContext.getApiId(),
-                                proxyContext.getStage(), AuthPolicy.HttpMethod.valueOf(proxyContext.getHttpMethod()), proxyContext.getResourcePath()))
+                        AuthPolicy.PolicyDocument.getAllowOnePolicy(region, requestContext.getAccountId(), requestContext.getApiId(),
+                                requestContext.getStage(), AuthPolicy.HttpMethod.valueOf(requestContext.getHttp().getMethod()), requestContext.getHttp().getPath()))
                 :
                 new AuthPolicy(principalId,
-                        AuthPolicy.PolicyDocument.getDenyAllPolicy(region, proxyContext.getAccountId(), proxyContext.getApiId(),
-                                proxyContext.getStage()));
+                        AuthPolicy.PolicyDocument.getDenyAllPolicy(region, requestContext.getAccountId(), requestContext.getApiId(),
+                                requestContext.getStage()));
     }
 
     public static void displayPolicy(AuthPolicy authPolicy) {

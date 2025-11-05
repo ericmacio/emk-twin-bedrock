@@ -3,6 +3,7 @@ package org.etyp.authorizer;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
+import com.amazonaws.services.lambda.runtime.events.APIGatewayV2CustomAuthorizerEvent;
 import org.etyp.authorizer.aws.AwsUtils;
 import org.etyp.authorizer.io.AuthPolicy;
 import org.etyp.authorizer.auth.Auth;
@@ -13,7 +14,7 @@ import software.amazon.awssdk.regions.Region;
 import java.util.HashMap;
 import java.util.Map;
 
-public class LambdaAuthorizerRequest implements RequestHandler<APIGatewayProxyRequestEvent, AuthPolicy> {
+public class LambdaAuthorizerRequest implements RequestHandler<APIGatewayV2CustomAuthorizerEvent, AuthPolicy> {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(LambdaAuthorizerRequest.class);
     private final static String REGION = System.getenv("REGION");
@@ -31,12 +32,12 @@ public class LambdaAuthorizerRequest implements RequestHandler<APIGatewayProxyRe
     }
 
     @Override
-    public AuthPolicy handleRequest(APIGatewayProxyRequestEvent request, Context context) {
+    public AuthPolicy handleRequest(APIGatewayV2CustomAuthorizerEvent request, Context context) {
 
-        APIGatewayProxyRequestEvent.ProxyRequestContext proxyContext = request.getRequestContext();
+        APIGatewayV2CustomAuthorizerEvent.RequestContext requestContext = request.getRequestContext();
 
         if (initDone()) {
-            Auth auth = new Auth(proxyContext, REGION);
+            Auth auth = new Auth(requestContext, REGION);
             Map<String, String> requestHeaders = request.getHeaders();
             Map<String, String> headers = new HashMap<>();
             for(String key : requestHeaders.keySet()) {
@@ -51,7 +52,7 @@ public class LambdaAuthorizerRequest implements RequestHandler<APIGatewayProxyRe
             }
         } else {
             LOGGER.error("ERROR: Failed to initialize");
-            return new Auth(proxyContext, REGION).getAuthPolicy(null, false);
+            return new Auth(requestContext, REGION).getAuthPolicy(null, false);
         }
 
     }
